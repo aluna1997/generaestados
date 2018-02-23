@@ -1,0 +1,223 @@
+
+#titulo{
+  
+  position: absolute;
+  left: 415px;
+  top: 20px;
+  font-size:30px;
+  
+}
+
+
+
+#linea_ini{
+
+    margin-top: 145px;
+
+}
+
+
+#logo {
+
+    position: absolute;
+    left: 418px;
+    top: 80px;
+    width:30px;
+}
+
+
+
+/* Cuadro dirección */
+
+#direccion{
+
+    position: absolute;
+    top:180px;
+    left: 140px;
+    font-size: 14px;
+    border: 1.2px solid grey;
+    border-radius: 5px;
+    width:325px;
+}
+
+
+#pincel_dir{
+
+    position: absolute;
+    top: 170px;
+    left: 115px;
+
+}
+
+
+
+
+/* Cuadro saldos */
+
+#saldos{
+  
+    position: absolute;
+    top:340px;
+    font-size: 14px;
+    border: 1.2px solid grey;
+    border-radius: 5px;
+    width:328px;
+    height: 255px;
+    left: 140px;
+
+}
+
+
+#pincel_sal{
+
+    position: absolute;
+    left: 115px;
+    right: 250px;
+    top: 330px;
+    height: 200px;
+    width: 480px;
+
+}
+
+
+/* Cuadro resumen */
+
+#resumen{
+
+  position: absolute;
+  left:535px;
+  top:180px;
+  font-size: 14px;
+  border: 1.2px solid grey;
+  border-radius: .5em;
+  width:328px;
+  height: 137px;
+
+}
+
+#pincel_res{
+
+    position: absolute;
+    left: 510px;
+    right: 250px;
+    top: 170px;
+    height: 200px;
+    width: 480px;
+
+}
+
+
+
+/* Cuadro cat */
+
+
+#cat{
+
+  position: absolute;
+  left:535px;
+  top:340px;
+  font-size: 14px;
+  border: 1.2px solid grey;
+  border-radius: 5px;
+  width:328px;
+  height: 130px;
+
+}
+
+#pincel_cat{
+
+    position: absolute;
+    left: 510px;
+    right: 250px;
+    top: 330px;
+    height: 200px;
+    width: 480px;
+
+}
+
+
+
+
+/* Cuadro rfc */
+
+#rfc{
+
+  position: absolute;
+  left:535px;
+  top: 480px;
+  font-size: 14px;
+  border: 1.2px solid grey;
+  border-radius: 5px;
+  width:328px;
+  height: 105px;
+    padding-top: 10px;
+
+
+}
+
+
+
+/* Cuadro movimientos */
+
+#movs{
+
+    position: absolute;
+    top: 620px;
+    font-size: 14px;
+    border: 1.2px solid grey;
+    border-radius: 5px;
+    width:650px;
+    left: 140px;
+    padding-left: 75px;
+
+
+
+
+}
+
+
+
+
+#pincel_movs{
+
+    position: absolute;
+    left: 80px;
+    top: 595px;
+
+
+}
+
+
+
+
+/* Pie de página */
+
+
+#pag{
+
+  
+  position: absolute;
+  left:485px;
+  top :1215px;
+  font-size: 13px;
+
+
+
+}
+
+
+
+#pie_img{
+
+    position: absolute;
+    top: 1250px;
+    height: 40px;
+    width: 800px;
+    left: -10px;
+
+
+}
+
+
+
+
