@@ -47,16 +47,18 @@ def creaprimerapag(jsonPlanes,jsonMovs):
 
     inicio = parsehtml("formatos","formato_base.html",jsonPlanes)
     medio = parsehtml("formatos","formato_movs.html",{}) + generamovs(jsonMovs[0:17]) + '</table>' + '\n' + '</div>'
-    pag = 1
-    fin = parsehtml("formatos","formato_cierre.html",{"pag": "Página " + str(pag)})
+    fin = parsehtml("formatos","formato_cierre.html",{"pag": "Página " + str(1)})
     html = inicio + medio + fin
 
-    return html,pag
+    return html
 
 
-def creanuevapag(jsonMovs,pag,start,topMovs,topPincelMovs):
+def creanuevapag(jsonMovs,start,topMovs,topPincelMovs):
+    pag=1
     pag+=1
-    inicio = parsehtml("formatos","formato_movs.html",{"top_pincel_movs" : topPincelMovs, "top_movs" : topMovs}) + generamovs(jsonMovs[start:start+22]) + '</table>' + '\n' + '</div>'
+
+
+    inicio = parsehtml("formatos","formato_movs.html",{"top_pincel_movs" : topPincelMovs, "top_movs" : topMovs}) + generamovs(jsonMovs[start:start+35]) + '</table>' + '\n' + '</div>'
     fin = parsehtml("formatos","formato_cierre.html",{"pag": "Página " + str(pag)})
     html = inicio + fin
     return html
@@ -64,31 +66,27 @@ def creanuevapag(jsonMovs,pag,start,topMovs,topPincelMovs):
 
 
 def generaestados(jsonPlanes,jsonMovs):
-    res = creaprimerapag(jsonPlanes,jsonMovs)
-
-    html1 = res[0]
-    pag = res[1]
+    html1 = creaprimerapag(jsonPlanes,jsonMovs)
     h = []
     start =17
     longitud = len(jsonMovs)
     topMovs = 1400
     topPincelMovs = 1370
     while(longitud > 0):
-        print(longitud)
-        h.append(creanuevapag(jsonMovs,pag,start,topMovs,topPincelMovs))
-        start+=22
+        h.append(creanuevapag(jsonMovs,start,topMovs,topPincelMovs))
+        start+=35
         longitud-=22
         topMovs+=1400
-        topPincelMovs+=1370
+        topPincelMovs+=1400
+    h.pop(-1)
 
     for i in h:
         html1 = html1 + i
 
-    #print(html1 + '  </body>' + '\n' + '<html>')
+
+    print(html1 + '  </body>' + '\n' + '<html>')
 
     return html1 + '  </body>' + '\n' + '<html>'
-
-
 
 
 
@@ -199,13 +197,113 @@ movimietos = [    {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_di
                    "fec_mov_mes": "dic", "fec_reg_anio": 2017},
                   {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
                    "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},{"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                   "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Plaza de la tecnología", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                   "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Plaza de la tecnología", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                   "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Plaza de la tecnología", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                   "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Plaza de la tecnología", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                   "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                   "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                   "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                   "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
                    "fec_mov_mes": "dic", "fec_reg_anio": 2017}
 
                   ]
 
 
+
 estado = generaestados(datos,movimietos)
-exportopdf('formatos\\css\\estilos_izq.css',estado,'prueba3.pdf')
+#estado = creaprimerapag(datos,movimietos)[0] + '  </body>' + '\n' + '<html>'
+exportopdf('formatos\\css\\estilos_izq.css',estado,'prueba4.pdf')
 
 
 

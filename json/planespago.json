@@ -1,3 +1,1 @@
-//Ejemplo planes de pago:
-[ {"anio": 2017, "saldo_final": 3154.32, "mensualidades": 10, "mes": "dic", "plazo": 12, "monto_pago_fijo": 358.83, "tasa": 0.29, "id_pago_diferido": 1, "concepto": "Plan de pagos elegido por cliente", "dia": 1, "monto_original": 3700.00},
-  {"anio": 2017, "saldo_final": 2023.78, "mensualidades": 2, "mes": "dic", "plazo": 3, "monto_pago_fijo": 1048.72, "tasa": 0.29, "id_pago_diferido": 5, "concepto": "Plan de pagos elegido por cliente", "dia": 22, "monto_original": 3000.00}]
+[{"nombre" : "Juan Pérez", "calle_numero" : "Dr. Díaz Arellano #41", "colonia" : "12 de Diciembre", "ciudad" : "CDMX", "cp" : "09870"}]
