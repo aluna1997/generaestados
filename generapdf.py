@@ -49,8 +49,8 @@ def generamovs(jsonMovs):
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-path_wkthmltopdf = b'C:\Program Files\wkhtmltopdf\\bin\wkhtmltopdf.exe'
-config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+#path_wkthmltopdf = b'C:\Program Files\wkhtmltopdf\\bin\wkhtmltopdf.exe'
+#config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
 
 # Creamos un entorno
 env = Environment(loader=FileSystemLoader("formatos"))
@@ -120,7 +120,7 @@ movimietos = [    {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_di
 
 medio = generamovs(movimietos)
 
-print(medio)
+#print(medio)
 
 
 
@@ -133,6 +133,8 @@ fin = template_fin.render(pag)
 
 #El html completo entonces será
 html = inicio + medio + fin
+
+print html
 
 
 
@@ -151,10 +153,7 @@ options = {
 
 
 
-css = 'formatos\\css\\estilos_izq.css'
-
-
-#pdfkit.from_string(html,'estado.pdf', options=options, css=css,configuration=config)
+pdfkit.from_string(html,'estado.pdf', options=options)
 
 
 

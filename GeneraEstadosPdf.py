@@ -1,22 +1,22 @@
 # - * - coding: UTF-8 - * -
 import sys
-
+reload(sys)
+sys.setdefaultencoding('utf-8')
 import pdfkit
 from jinja2 import Environment, FileSystemLoader
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
 
 def generamovs(jsonMovs):
     lista = []
 
     for i in jsonMovs:
-        lista.append((' <tr>' + '\n' + '    <td>' + str(i["fec_mov_dia"]) + '/' +
-            str(i["fec_mov_mes"]) + '/' + str(i["fec_mov_anio"]) + '    </td>' + '\n' + '   <td>' +
-            str(i["descripcion"]) + '</td>' + '\n' + '   <td>' + '$' +
-            str(i["monto"]) + ' </td>' + '\n' + '</tr>' + '\n'))
+        lista.append(('\n' +'<tr>' + '\n' + '<td>' + str(i["fec_mov_dia"]) + '/' +
+            str(i["fec_mov_mes"]) + '/' + str(i["fec_mov_anio"]) + '</td>' + '\n' + '<td>' +
+            str(i["descripcion"]) + '</td>' + '\n' + '<td style="text-align:rigth; padding-right:120px;" <span style="text-align:left;">$&nbsp;&nbsp;</span>' +
+            str(i["monto"]) + '</td>' + '\n' + '</tr>' + '\n'))
 
+    #print ' '.join(lista)
     return ' '.join(lista)
 
 
@@ -27,8 +27,8 @@ def parsehtml(rutahtml,nombrehtml,diccionario):
     return string
 
 def exportopdf(rutacss,html,nombrehtml):
-    path_wkthmltopdf = b'C:\Program Files\wkhtmltopdf\\bin\wkhtmltopdf.exe'
-    config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+    #path_wkthmltopdf = b'C:\Program Files\wkhtmltopdf\\bin\wkhtmltopdf.exe'
+    #config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
 
     options = {
         'page-size': 'Letter',
@@ -39,7 +39,7 @@ def exportopdf(rutacss,html,nombrehtml):
         'encoding': "UTF-8"
     }
 
-    pdfkit.from_string(html,nombrehtml, options=options, css=rutacss,configuration=config)
+    pdfkit.from_string(html,nombrehtml, options=options, css=rutacss)
 
 
 
@@ -50,146 +50,540 @@ def creaprimerapag(jsonPlanes,jsonMovs):
     fin = parsehtml("formatos","formato_cierre.html",{"pag": "Página " + str(1)})
     html = inicio + medio + fin
 
+    #print html
     return html
 
 
 def creanuevapag(jsonMovs,start,topMovs,topPincelMovs,topPag,numPag,topPie):
-    inicio = parsehtml("formatos","formato_movs.html",{"top_pincel_movs" : topPincelMovs, "top_movs" : topMovs}) + generamovs(jsonMovs[start:start+35]) + '</table>' + '\n' + '</div>'
-    fin = parsehtml("formatos","formato_cierre.html",{"pag": "Página " + str(numPag), "top_pag" : topPag, "top_pie": topPie})
+    inicio = parsehtml("formatos","formato_movs.html",{"top_pincel_movs" : topPincelMovs, 
+                                                       "top_movs" : topMovs}) + generamovs(jsonMovs[start:start+40]) + '</table>' + '\n' + '</div>'
+    fin = parsehtml("formatos","formato_cierre.html",{"pag": "Página " + str(numPag), 
+                                                      "top_pag" : topPag, 
+                                                      "top_pie": topPie})
     html = inicio + fin
+    #print html
     return html
 
 
+def creaultimapag(numPag,topPag,topPie):
+    ultima_pag = parsehtml("formatos", "formato_info.html", {"top_escudo_vexi" : topPag,
+                                                             "top_call_vexi" : topPag + 250,
+                                                             "top_glos_vexi" : topPag + 450,
+                                                             "top_prof_vexi" : topPag + 605,
+                                                             "top_extra_vexi": topPag + 825})
+    ultima_pag = ultima_pag + parsehtml("formatos","formato_cierre.html",{"pag": "Página " + str(numPag),
+                                                                          "top_pag" : topPag + 1160,
+                                                                          "top_pie" : topPie + 1170})
+    return ultima_pag
+
 
 def generaestados(jsonPlanes,jsonMovs):
+    
+    # Primera pagina (logo,cuandros generales,17 movimientos y pie de pagina)
     html1 = creaprimerapag(jsonPlanes,jsonMovs)
-    h = []
-    longitud = len(jsonMovs)-17
-    start =17
-    topMovs = 1400
-    topPincelMovs = 1370
+    longitud = (len(jsonMovs)-17)
+    start = 17
+    topMovs = 1350
+    topPincelMovs = 1325
     topPag = 2540
-    numPag=2
+    numPag = 2
     topPie = 2560
-    while(longitud > 0):
-        h.append(creanuevapag(jsonMovs,start,topMovs,topPincelMovs,topPag,numPag,topPie))
-        numPag+=1
-        start+=35
-        longitud-=35
-        topMovs+=1300
-        topPincelMovs+=1308
-        topPag+=1300
-        topPie+=1308
-
+    h = []
+    
+    while (longitud > 0):
+        h.append(creanuevapag(jsonMovs, start, topMovs, topPincelMovs, topPag, numPag, topPie))
+        longitud -= 40
+        start += 40
+        topMovs += 1350
+        topPincelMovs += 1350
+        topPag += 1300
+        numPag += 1
+        topPie += 1300
+            
     for i in h:
         html1 = html1 + i
+    
+    html1 = html1 + creaultimapag(numPag, topPag -1150, topPie -1150)
 
-    #print(html1 + '  </body>' + '\n' + '<html>')
+    print html1 + '  </body>' + '\n' + '<html>'
     return html1 + '  </body>' + '\n' + '<html>'
 
+if __name__ == '__main__':
+
+    datos = {
+    
+            'nombre' : 'Juan Pérez',
+            'calle_numero' : 'Dr. Díaz Arellano #41',
+            'colonia' : '12 de Diciembre',
+            'ciudad' : 'CDMX',
+            'cp' : '09877',
+            'saldo_anterior' : 10000000.45,
+            'com_ret_men' :  200321.31,
+            'comisiones_cobr' : 2345.87,
+            'intereses' : 235.56,
+            'iva' : 23.56,
+            'pag_rem_dev' : 2345.67,
+            'al_corte' : 1200.56,
+            'pagos_diferidos' : 12345.65,
+            'total' : 12345.65
+    }
+    
+    movimietos = [    {"monto": 376.45, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Primero.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": 10000000.45, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Holi", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Ultimo", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": 376.45, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Primero.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": 10000000.45, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Holi", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": 376.45, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Primero.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": 10000000.45, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Holi", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Ultimo", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": 376.45, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Primero.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": 10000000.45, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Holi", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": 376.45, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Primero.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": 10000000.45, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Holi", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Ultimo", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": 376.45, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Primero.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": 10000000.45, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Holi", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
+                       "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017},
+                      {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
+                       "descripcion": "Ultimo", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
+                       "fec_mov_mes": "dic", "fec_reg_anio": 2017}
+    
+                      ]
+    
+    #s = 1500.56
+    #print('{:9,.2f}'.format(s))
 
 
-datos = {
-
-        'nombre' : 'Juan Pérez',
-        'calle_numero' : 'Dr. Díaz Arellano #41',
-        'colonia' : '12 de Diciembre',
-        'ciudad' : 'CDMX',
-        'cp' : '09877',
-        'saldo_anterior' : 1500.56,
-        'com_ret_men' :  200321.31,
-        'comisiones_cobr' : 2345.87,
-        'intereses' : 235.56,
-        'iva' : 23.56,
-        'pag_rem_dev' : 2345.67,
-        'al_corte' : 1200.56,
-        'pagos_diferidos' : 12345.65,
-        'total' : 12345.65
-}
-
-movimietos = [    {"monto": 376.45, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
-                   "descripcion": "Primero.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
-                   "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
-                   "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
-                   "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
-                   "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Mac Store", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 15, "fec_mov_anio": 2017,
-                   "descripcion": "Su pago... Gracias.", "fec_reg_dia": 18, "orden": 1, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Suburbia", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Mixup", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017},
-                  {"monto": -5230.00, "periodo": 0, "id_disputa": 0, "fec_mov_dia": 16, "fec_mov_anio": 2017,
-                   "descripcion": "Ultimo", "fec_reg_dia": 17, "orden": 2, "fec_reg_mes": "dic",
-                   "fec_mov_mes": "dic", "fec_reg_anio": 2017}
-
-                  ]
-
-s = 1500.56
-print('{:9,.2f}'.format(s))
-
-
-
-estado = generaestados(datos,movimietos)
-#estado = creaprimerapag(datos,movimietos)[0] + '  </body>' + '\n' + '<html>'
-exportopdf('formatos\\css\\estilos_izq.css',estado,'prueba24.pdf')
+    estado = generaestados(datos,movimietos)
+    exportopdf('/home/falv/vexi_workspace/generaestados/formatos/css/estilos_izq.css',estado,'prueba_estado.pdf')
 
 
 

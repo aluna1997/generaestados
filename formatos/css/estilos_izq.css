@@ -2,7 +2,7 @@
 #titulo{
   
   position: absolute;
-  left: 415px;
+  left: 370px;
   top: 20px;
   font-size:30px;
   
@@ -33,19 +33,20 @@
 
     position: absolute;
     top:180px;
-    left: 140px;
+    left: 80px;
     font-size: 14px;
     border: 1.2px solid grey;
     border-radius: 5px;
-    width:325px;
+    width:425px;
+    height : 137px;
 }
 
 
 #pincel_dir{
 
     position: absolute;
-    top: 170px;
-    left: 115px;
+    top: 167px;
+    left: 55px;
 
 }
 
@@ -61,9 +62,8 @@
     font-size: 14px;
     border: 1.2px solid grey;
     border-radius: 5px;
-    width:328px;
-    height: 255px;
-    left: 140px;
+    width:425px;
+    left: 80px;
 
 }
 
@@ -71,11 +71,10 @@
 #pincel_sal{
 
     position: absolute;
-    left: 115px;
-    right: 250px;
-    top: 330px;
+    left: 60px;
+    right: 245px;
+    top: 325px;
     height: 200px;
-    width: 480px;
 
 }
 
@@ -90,7 +89,7 @@
   font-size: 14px;
   border: 1.2px solid grey;
   border-radius: .5em;
-  width:328px;
+  width:368px;
   height: 137px;
 
 }
@@ -102,7 +101,6 @@
     right: 250px;
     top: 170px;
     height: 200px;
-    width: 480px;
 
 }
 
@@ -119,7 +117,7 @@
   font-size: 14px;
   border: 1.2px solid grey;
   border-radius: 5px;
-  width:328px;
+  width:368px;
   height: 130px;
 
 }
@@ -131,7 +129,6 @@
     right: 250px;
     top: 330px;
     height: 200px;
-    width: 480px;
 
 }
 
@@ -148,9 +145,9 @@
   font-size: 14px;
   border: 1.2px solid grey;
   border-radius: 5px;
-  width:328px;
-  height: 105px;
-    padding-top: 10px;
+  width:368px;
+  height: 155px;
+  padding-top: 10px;
 
 
 }
@@ -162,15 +159,13 @@
 #movs{
 
     position: absolute;
-    top: 620px;
+    top: 680px;
     font-size: 14px;
     border: 1.2px solid grey;
     border-radius: 5px;
     width:650px;
     left: 140px;
-    padding-left: 75px;
-
-
+    padding-left: 15px;
 
 
 }
@@ -182,7 +177,7 @@
 
     position: absolute;
     left: 80px;
-    top: 595px;
+    top: 655px;
 
 
 }
@@ -197,8 +192,8 @@
 
   
   position: absolute;
-  left:485px;
-  top :1215px;
+  left:30px;
+  top :1225px;
   font-size: 13px;
 
 
@@ -215,6 +210,167 @@
     width: 800px;
     left: -10px;
 
+
+}
+
+
+/* Contacto */
+
+
+
+#escudo {
+	position: absolute;
+    left: 18px;
+    top: 8px;
+    width: 50px; 
+    height: 50px;
+}
+
+#uso{
+
+    position: absolute;
+    font-size: 14px;
+    border: 1.2px solid grey;
+    border-radius: 5px;
+    width: 700px;
+    left: 120px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+}
+
+
+#call {
+	position: absolute;
+    left: 18px;
+    top: 1px;
+    width: 50px; 
+    height: 50px;
+}
+
+
+
+#center{
+
+    position: absolute;
+    font-size: 14px;
+    border: 1.2px solid grey;
+    border-radius: 5px;
+    width: 700px;
+    left: 120px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+}
+
+#escudo {
+	position: absolute;
+    left: 18px;
+    top: 8px;
+    width: 50px; 
+    height: 50px;
+}
+
+#uso{
+
+    position: absolute;
+    top: 60px;
+    font-size: 14px;
+    border: 1.2px solid grey;
+    border-radius: 5px;
+    width:670px;
+    left: 140px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+}
+
+
+#call {
+	position: absolute;
+    left: 18px;
+    top: 1px;
+    width: 50px; 
+    height: 50px;
+}
+
+#center{
+
+    position: absolute;
+    top: 330px;
+    font-size: 14px;
+    border: 1.2px solid grey;
+    border-radius: 5px;
+    width:670px;
+    left: 140px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+}
+
+
+#books {
+
+    position: absolute;
+    left: 18px;
+    top: 10px;
+    width: 50px; 
+    height: 50px;
+}
+
+#glos {
+
+    position: absolute;
+    top: 530px;
+    font-size: 14px;
+    border: 1.2px solid grey;
+    border-radius: 5px;
+    width:670px;
+    left: 140px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+
+}
+
+#web {
+
+    position: absolute;
+    left: 18px;
+    top: 10px;
+    width: 50px; 
+    height: 50px;
+}
+
+#prof {
+
+    position: absolute;
+    top: 690px;
+    font-size: 14px;
+    border: 1.2px solid grey;
+    border-radius: 5px;
+    width:670px;
+    left: 140px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+
+}
+
+
+#extra {
+
+    position: absolute;
+    top: 915px;
+    font-size: 14px;
+    border: 1.2px solid grey;
+    border-radius: 5px;
+    width:670px;
+    left: 140px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 15px;
+    padding-top: 10px;
 
 }
 
