@@ -95,18 +95,21 @@
       <!--===================================== Cuadro resumen  ==========================================-->
       <div id="pincel_res"><img style="width:420px;" src="file:///home/falv/vexi_workspace/generaestados/formatos/img/pincel.png"/></div>
       <div id="resumen">
-         <table  style="border-collapse: separate; border-spacing: 9px;">
+         <table  style="border-collapse: separate; border-spacing: 5px;">
             <tr>
                <td style="color:white;"><b>Fecha límite de pago</b></td>
-               <td style="color:white;">&nbsp;&nbsp;&nbsp;18/Oct/2017</td>
+               <td style="color:white;text-align:left;"></td>
+               <td style="color:white;">&nbsp;&nbsp;&nbsp;{{fec_lim_pago}}</td>
             </tr>
             <tr>
                <td>Pago mínimo</td>
-               <td>&nbsp;&nbsp;&nbsp;$1,000,000.31</td>
+               <td style="text-align:left;">$</td>
+               <td style="text-align:right;">{{pago_min}}</td>
             </tr>
             <tr>
                <td>Pago para no generar intereses</td>
-               <td>&nbsp;&nbsp;&nbsp;$004,567.76</td>
+               <td style="text-align:left;">$</td>
+               <td style="text-align:right;">{{pago_para_no_int}}</td>
             </tr>
          </table>
       </div>
@@ -115,7 +118,7 @@
       <div id="cat">
          <table style="border-collapse: separate; border-spacing: 11px;">
             <tr>
-               <td style="color:white;"><b>CAT 91.00%</b></td>
+               <td style="color:white;"><b>CAT {{cat}}%</b></td>
             </tr>
             <tr>
                <td>Tasa interés</td>
@@ -124,13 +127,13 @@
             </tr>
             <tr>
                <td>Ordinaria</td>
-               <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.18%</td>
-               <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;65%</td>
+               <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{tasa_ord_diaria}}%</td>
+               <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{tasa_ord_anual}}%</td>
             </tr>
             <tr>
                <td>Moratoria</td>
-               <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.23%</td>
-               <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;84.5%</td>
+               <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{tasa_mor_diaria}}%</td>
+               <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{tasa_mor_anual}}%</td>
             </tr>
          </table>
       </div>
@@ -140,15 +143,15 @@
             <tbody>
                <tr>
                   <td>Tarjeta fisica</td>
-                  <td>&nbsp;&nbsp;&nbsp;&nbsp;547588847485856686</td>
+                  <td>&nbsp;&nbsp;&nbsp;&nbsp;{{tarjeta_fisica}}</td>
                </tr>
                <tr>
                   <td>Tarjeta online</td>
-                  <td>&nbsp;&nbsp;&nbsp;&nbsp;547588847485856686</td>
+                  <td>&nbsp;&nbsp;&nbsp;&nbsp;{{tarjeta_online}}</td>
                </tr>
                <tr>
                   <td>RFC</td>
-                  <td>&nbsp;&nbsp;&nbsp;&nbsp;5475888HDKD856686</td>
+                  <td>&nbsp;&nbsp;&nbsp;&nbsp;{{rfc}}</td>
                </tr>
             </tbody>
          </table>
